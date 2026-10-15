@@ -1,7 +1,17 @@
 package layout
 
+import (
+	"cmp"
+	"workshop/web/views/components"
+)
+
 type BaseProps struct {
-	Title string
+	Title       string
+	Description string
+	Current     string // The nav item for this page: "home", "stats" or "gallery".
+	Map         bool   // Load Leaflet, for a page with a map.
+	Scene       bool   // Load three.js, for a page with a 3D scene.
+	Filter      bool   // Load the filter script, for a page with filter chips.
 }
 
 templ Base(props BaseProps) {
@@ -10,14 +20,100 @@ templ Base(props BaseProps) {
 		<head>
 			<meta charset="utf-8"/>
 			<meta name="viewport" content="width=device-width, initial-scale=1"/>
+			<link rel="icon" href="/assets/images/logo.svg" type="image/svg+xml"/>
+			<link rel="manifest" href="/assets/manifest.json"/>
+			<meta name="theme-color" content="#0B0B0C"/>
 			<title>{ props.Title }</title>
+			<meta name="description" content={ cmp.Or(props.Description, defaultDescription) }/>
+			<meta property="og:type" content="website"/>
+			<meta property="og:site_name" content="Safari Rally Kenya · Wildlife stage"/>
+			<meta property="og:title" content={ props.Title }/>
+			<meta property="og:description" content={ cmp.Or(props.Description, defaultDescription) }/>
+			<meta property="og:image" content="/assets/images/rally/safari-2024.jpg"/>
+			<meta property="og:image:alt" content="A rally car kicking up red dust on a Safari Rally Kenya stage"/>
+			<meta name="twitter:card" content="summary_large_image"/>
+			<script>document.documentElement.classList.add('js')</script>
+			if props.Scene {
+				<script type="importmap">
+					{
+						"imports": {
+							"three": "https://cdn.jsdelivr.net/npm/three@0.186.1/build/three.module.js",
+							"three/addons/": "https://cdn.jsdelivr.net/npm/three@0.186.1/examples/jsm/"
+						}
+					}
+				</script>
+				<link rel="stylesheet" href="/assets/css/threejs.css"/>
+			}
+			<link rel="preconnect" href="https://fonts.googleapis.com"/>
+			<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+			<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,600;0,700;1,600;1,700;1,800&family=Barlow:wght@400;500;600&display=swap"/>
+			if props.Map {
+				<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" integrity="sha512-h9FcoyWjHcOcmEVkxOfTLnmZFWIH0iZhZT1H2TbOq55xssQGEJHEaIm+PgoUaZbRvQTNTluNOEfb1ZRy6D3BOw==" crossorigin="anonymous" referrerpolicy="no-referrer"/>
+				<link rel="stylesheet" href="/assets/css/map.css"/>
+			}
+			if props.Filter {
+				<link rel="stylesheet" href="/assets/css/filter.css"/>
+			}
+			<link rel="stylesheet" href="/assets/css/charts.css"/>
+			<link rel="stylesheet" href="/assets/css/lightbox.css"/>
+			<link rel="stylesheet" href="/assets/css/reveal.css"/>
+			<link rel="stylesheet" href="/assets/css/weather.css"/>
 			<link rel="stylesheet" href="/assets/css/app.css"/>
+			<script src="/assets/js/reveal.js" defer></script>
 		</head>
 		<body>
-			<main class="container">
+			@components.WeatherIcons()
+			<a class="skip" href="#main">Skip to the content</a>
+			<header class="masthead">
+				<div class="masthead__inner">
+					<a class="brand" href="/">
+						<img src="/assets/images/logo.svg" alt="" width="44" height="44"/>
+						<span class="brand__name">
+							<span class="brand__event">Safari Rally Kenya</span>
+							<span class="brand__sub">Wildlife stage</span>
+						</span>
+					</a>
+					<nav class="nav" aria-label="Main">
+						<ul>
+							for _, item := range navItems {
+								<li>
+									<a
+										href={ templ.URL(item.Href) }
+										if item.Key == props.Current {
+											aria-current="page"
+										}
+									>{ item.Label }</a>
+								</li>
+							}
+						</ul>
+					</nav>
+				</div>
+				<div class="livery" aria-hidden="true"></div>
+			</header>
+			<main id="main">
 				{ children... }
 			</main>
-			<script src="/assets/js/app.js"></script>
+			<footer class="footer">
+				<div class="chequer" aria-hidden="true"></div>
+				<div class="footer__inner">
+					<p class="footer__brand">Safari Rally Kenya · Wildlife stage</p>
+					<p>
+						Wildlife records from <a href="https://www.gbif.org">GBIF</a>, weather from
+						<a href="https://open-meteo.com">Open-Meteo</a>, maps © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors.
+						Each animal photo is credited to its photographer. Stage positions are the centre of each stage's area, not its exact roads.
+					</p>
+					<p>A fan site made at GopherCon Africa 2026. Not affiliated with the WRC, the FIA or the Safari Rally Kenya organisers.</p>
+				</div>
+			</footer>
+			@components.Lightbox()
+			if props.Map {
+				<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js" integrity="sha512-puJW3E/qXDqYp9IfhAI54BJEaWIfloJ7JWs7OeD5i6ruC9JZL1gERT1wjtwXFlh7CjE7ZJ+/vcRZRkIYIb6p4g==" crossorigin="anonymous" referrerpolicy="no-referrer" defer></script>
+				<script src="/assets/js/map.js" defer></script>
+			}
+			if props.Filter {
+				<script src="/assets/js/filter.js" defer></script>
+			}
+			<script src="/assets/js/lightbox.js" defer></script>
 		</body>
 	</html>
 }

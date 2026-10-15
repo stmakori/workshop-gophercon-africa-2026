@@ -1,0 +1,74 @@
+package pages
+
+import (
+	"strconv"
+	"workshop/internal/domain/sighting"
+	"workshop/web/views/components"
+	"workshop/web/views/layout"
+)
+
+templ Stats(sightings []sighting.Sighting) {
+	{{ sum := sighting.Summarise(sightings) }}
+	{{ byYear := sighting.CountByYear(sightings) }}
+	@layout.Base(layout.BaseProps{
+		Title:       "Championship standings · Safari Rally Kenya",
+		Description: "Standings for the wildlife seen along the Safari Rally Kenya route: most-seen animals, results by year and totals.",
+		Current:     "stats",
+	}) {
+		<section class="section section--first">
+			<header class="section__head">
+				<p class="section__num">WRC</p>
+				<h1>Championship standings</h1>
+				<p class="section__note">Every sighting along the Safari Rally route, scored like the championship.</p>
+			</header>
+			if sum.Sightings == 0 {
+				<p class="empty">No standings yet. Run <code>go run . db seed</code> and refresh.</p>
+			} else {
+				<dl class="board board--stats">
+					<div class="board__cell board__cell--live">
+						<dt>Sightings</dt>
+						<dd>{ sum.Sightings }</dd>
+					</div>
+					<div class="board__cell">
+						<dt>On the route</dt>
+						<dd>{ components.CountOnRoute(sightings) }</dd>
+					</div>
+					<div class="board__cell">
+						<dt>Species</dt>
+						<dd>{ sum.Species }</dd>
+					</div>
+					<div class="board__cell">
+						<dt>Crews</dt>
+						<dd>{ sum.Recorders }</dd>
+					</div>
+					<div class="board__cell">
+						<dt>Photos</dt>
+						<dd>{ components.PhotoCount(sightings) }</dd>
+					</div>
+					<div class="board__cell">
+						<dt>Seasons</dt>
+						<dd>{ strconv.Itoa(sum.Earliest.Year()) }<small>–{ strconv.Itoa(sum.Latest.Year()) }</small></dd>
+					</div>
+				</dl>
+				<div class="standings standings--stats">
+					<div class="panel panel--wide reveal">
+						<h2 class="panel__title">Drivers' standings · most seen</h2>
+						@components.Bars(components.TopAnimals(sightings, 10))
+					</div>
+					<div class="panel reveal">
+						<h2 class="panel__title">Results by year</h2>
+						@components.YearResults(byYear)
+					</div>
+					<div class="panel reveal">
+						<h2 class="panel__title">Busiest stages</h2>
+						@components.Bars(components.StageTally(sightings, 9))
+					</div>
+					<div class="panel reveal">
+						<h2 class="panel__title">Top crews</h2>
+						@components.Bars(components.TopCrews(sightings, 8))
+					</div>
+				</div>
+			}
+		</section>
+	}
+}

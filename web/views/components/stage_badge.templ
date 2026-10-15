@@ -1,0 +1,10 @@
+package components
+
+import "workshop/internal/domain/sighting"
+
+templ StageBadge(s sighting.Sighting) {
+	<p class={ "stage-badge", templ.KV("stage-badge--off", !OnRoute(s)) }>
+		<span class="stage-badge__flag" aria-hidden="true"></span>
+		{ StageLabel(s) }
+	</p>
+}

@@ -1,0 +1,17 @@
+package pages
+
+import "workshop/web/views/layout"
+
+templ NotFound() {
+	@layout.Base(layout.BaseProps{
+		Title: "Off the road · Safari Rally Kenya",
+	}) {
+		<section class="section error">
+			<p class="section__num">404</p>
+			<h1>Off the road, <span class="error__accent">wrong stage</span></h1>
+			<p>This page isn't on the road book. The marshals are pointing you back to the service park.</p>
+			<p><a class="button" href="/">Back to the home page</a></p>
+			<div class="chequer error__flag" aria-hidden="true"></div>
+		</section>
+	}
+}

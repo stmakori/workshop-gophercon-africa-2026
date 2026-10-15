@@ -9,7 +9,11 @@ templ Error(message string, code int) {
 	@layout.Base(layout.BaseProps{
 		Title: "Error " + strconv.Itoa(code),
 	}) {
-		<h1>{ strconv.Itoa(code) }</h1>
-		<p>{ message }</p>
+		<section class="section error">
+			<p class="section__num">{ strconv.Itoa(code) }</p>
+			<h1>Off the road</h1>
+			<p>{ message }</p>
+			<p><a class="button" href="/">Back to the service park</a></p>
+		</section>
 	}
 }

@@ -1,0 +1,8 @@
+{
+	"name": "Safari Rally Kenya · Wildlife stage",
+	"short_name": "Safari Rally",
+	"icons": [{ "src": "/assets/images/logo.svg", "sizes": "any", "type": "image/svg+xml" }],
+	"theme_color": "#0B0B0C",
+	"background_color": "#0B0B0C",
+	"display": "standalone"
+}

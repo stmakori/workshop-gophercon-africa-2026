@@ -1,0 +1,29 @@
+package pages
+
+import (
+	"workshop/internal/domain/sighting"
+	"workshop/web/views/components"
+	"workshop/web/views/layout"
+)
+
+templ Gallery(sightings []sighting.Sighting) {
+	{{ count := components.PhotoCount(sightings) }}
+	@layout.Base(layout.BaseProps{
+		Title:       "Photo wall · Safari Rally Kenya",
+		Description: "Photos of the wildlife seen along the Safari Rally Kenya route, credited to each photographer.",
+		Current:     "gallery",
+	}) {
+		<section class="section section--first">
+			<header class="section__head">
+				<p class="section__num">Photo</p>
+				<h1>Photo wall</h1>
+				<p class="section__note">{ count } photos from the crews who saw them. Click a photo to see it big, or the animal's name for its stage report.</p>
+			</header>
+			if count == 0 {
+				<p class="empty">No photos on the route yet. Run <code>go run . db seed</code> and refresh.</p>
+			} else {
+				@components.PhotoWall(sightings)
+			}
+		</section>
+	}
+}

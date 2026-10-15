@@ -18,6 +18,69 @@ server-side with [templ](https://templ.guide), and enriched with
 This repository is yours for the day. It's the finished app, we walk through it together, then
 you make the site your own in your fork and push it there.
 
+## My site: Safari Rally Kenya · Wildlife stage
+
+The sightings site, rebuilt as a WRC broadcast for the **Safari Rally Kenya**, the World Rally
+Championship round run from Naivasha every March. The Kenyan flag meets a stage timing screen.
+
+![The home page: a slanted "Safari Rally Kenya" title in the flag's colours, a 2024 Safari Rally photo and a spinning 3D rally wheel](docs/screenshots/home.jpg)
+
+**The idea: every sighting is timed against the real 2026 route.** The nine stage areas of the
+2026 rally (Naivasha service park, Loldia, KenGen Geothermal, Kedong, Soysambu, Elmenteita,
+Sleeping Warrior, Oserengoni and the Hell's Gate Power Stage) are mapped in running order. Each
+sighting is measured to its nearest stage with the haversine formula. Sightings within 25 km are
+ranked as results (P01, P02…) and the rest are marked **OFF** route.
+
+![The stage route map: chequered stage flags joined in running order around Lake Naivasha, with red sightings near Soysambu](docs/screenshots/stage-route.jpg)
+
+| Page | What's on it |
+|------|--------------|
+| `/` | Banner with a three.js rally wheel, the stage route map, stage results ranked by distance (filter by stage, animal or year), standings, and Safari Rally photos |
+| `/sightings/{id}` | A **stage report**: big photo, distance to the nearest stage, crew, road-book position, full stage conditions (weather) and a map of the spot among the stages |
+| `/stats` | **Championship standings**: a timing board of totals, the most-seen animals, the busiest stages, results by year and the top crews |
+| `/gallery` | A photo wall of every sighting's photos, each credited to its photographer, with its licence |
+| anything else | A 404: "Off the road, wrong stage" |
+
+![A results entry: P01 White rhinoceros, 2.0 km from Soysambu, with its photo, crew and a stage conditions panel](docs/screenshots/results.jpg)
+
+<p>
+  <img src="docs/screenshots/stats.jpg" alt="Championship standings: a timing board of totals and a most-seen leaderboard" width="49%"/>
+  <img src="docs/screenshots/stage-report.jpg" alt="A stage report for a white rhinoceros seen 2.0 km from Soysambu" width="49%"/>
+</p>
+
+### How it's built
+
+- **Go and templ only, no JavaScript build.** Pages are templ components in `web/views/`, handlers
+  in `web/handlers/`, and every route is in `web.New`. The home, stats and gallery pages share one
+  `routeFilter()` (Kenya, and the animals of the Rift Valley stages) and one `routePage` helper.
+- **The route maths** lives in `web/views/components/rally.go`: the stages, `NearestStage`,
+  `OnRoute`, `ByDistance` and `StageTally`. It's tested in `rally_test.go`.
+- **Handlers are tested** in `web/handlers/`: a stage report that exists, a bad id and a missing
+  sighting (both 404), a store failure (500), and stats and gallery with and without data.
+- **Each page loads only what it uses.** Leaflet loads on pages with a map, three.js only on the
+  home page, and the filter script only where there are filter chips.
+- **Kind to phones and people.** It's checked at 390 px wide with no sideways scroll. Motion stops
+  for people who turn it off, the 3D wheel pauses off screen, and labels, alt text and focus
+  outlines are throughout.
+- **The design** is written down in [`web/DESIGN.md`](web/DESIGN.md): colours, lettering, components
+  and rules.
+
+```bash
+make web          # http://localhost:8080
+go test ./web/... # handler and route tests
+```
+
+### Credits
+
+Wildlife records from [GBIF](https://www.gbif.org), weather from [Open-Meteo](https://open-meteo.com),
+maps © [OpenStreetMap](https://www.openstreetmap.org/copyright) contributors. Rally photos from
+Wikimedia Commons: [Radziejka](https://commons.wikimedia.org/wiki/File:Kajetan_Kajetanowicz_Rajd_Safari2024.jpg)
+(CC BY-SA 4.0), [Joelm69](https://commons.wikimedia.org/wiki/File:WRC_Safari_Rally_2021_(cropped_2).jpg)
+(CC BY-SA 4.0), [Jared-G-Maina](https://commons.wikimedia.org/wiki/File:Kenya_KCB_Rally_Naivasha_4.jpg)
+(CC BY-SA 4.0) and [TTTNIS](https://commons.wikimedia.org/wiki/File:2021_Toyota_Yaris_WRC_Katsuta.jpg)
+(CC0). Stage positions are the centre of each stage's area, not its exact roads. A fan site,
+not affiliated with the WRC, the FIA or the Safari Rally Kenya organisers.
+
 ## Before you start
 
 You need Go (the version in `go.mod`), Git, `make` and a GitHub account. For the Theming block

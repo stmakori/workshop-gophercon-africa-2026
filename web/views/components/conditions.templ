@@ -1,0 +1,56 @@
+package components
+
+import (
+	"strconv"
+	"workshop/internal/domain/weather"
+)
+
+templ StageConditions(w weather.Weather, full bool) {
+	if w.ObservedAt.IsZero() {
+		<p class="conditions conditions--none">No stage conditions recorded</p>
+	} else {
+		<dl class={ "conditions", "conditions--" + sky(w.Condition.Code), templ.KV("conditions--full", full) }>
+			<div class="conditions__sky">
+				<dt class="visually-hidden">Sky</dt>
+				<dd>
+					<svg class="conditions__icon" aria-hidden="true"><use href={ templ.URL("#wx-" + sky(w.Condition.Code)) }></use></svg>
+					{ w.Condition.Description }
+				</dd>
+			</div>
+			<div>
+				<dt>Temp</dt>
+				<dd>{ degrees(w.Temperature.Actual) }</dd>
+			</div>
+			<div>
+				<dt>Rain</dt>
+				<dd>{ millimetres(w.Precipitation.Rain) }</dd>
+			</div>
+			<div>
+				<dt>Wind</dt>
+				<dd class={ "conditions__wind", "weather__wind--" + compass(w.Wind.Direction) }>
+					<span class="weather__arrow" aria-hidden="true"></span>
+					<span aria-hidden="true">{ kmh(w.Wind.Speed) }</span>
+					<span class="visually-hidden">{ windLabel(w.Wind) }</span>
+				</dd>
+			</div>
+			if full {
+				<div>
+					<dt>Feels like</dt>
+					<dd>{ degrees(w.Temperature.Apparent) }</dd>
+				</div>
+				<div>
+					<dt>Gusts</dt>
+					<dd>{ kmh(w.Wind.Gusts) }</dd>
+				</div>
+				<div>
+					<dt>Humidity</dt>
+					<dd>{ strconv.Itoa(w.Humidity) }%</dd>
+				</div>
+				<div>
+					<dt>Cloud</dt>
+					<dd>{ strconv.Itoa(w.CloudCover) }%</dd>
+				</div>
+			}
+		</dl>
+	}
+}

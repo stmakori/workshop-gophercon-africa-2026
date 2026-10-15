@@ -1,0 +1,26 @@
+package components
+
+import "workshop/internal/domain/sighting"
+
+templ PhotoWall(sightings []sighting.Sighting) {
+	<ul class="wall">
+		for _, s := range sightings {
+			for _, m := range photos(s.Media) {
+				<li class="wall__item">
+					<figure>
+						<a href={ templ.URL(m.URL) } data-lightbox data-caption={ wallCaption(s, m) }>
+							<img src={ m.URL } alt={ photoAlt(s, m) } loading="lazy"/>
+						</a>
+						<figcaption>
+							<a class="wall__animal" href={ templ.URL(ReportURL(s)) }>{ displayName(s.Species) }</a>
+							<span class="wall__credit">{ photographer(m) }</span>
+							if m.License != "" {
+								<span class="wall__licence">{ licence(m.License) }</span>
+							}
+						</figcaption>
+					</figure>
+				</li>
+			}
+		}
+	</ul>
+}

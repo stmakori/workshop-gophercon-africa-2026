@@ -5,46 +5,81 @@ import (
 	"fmt"
 	"slices"
 	"strings"
+	"unicode"
+	"unicode/utf8"
 
 	"workshop/internal/domain/sighting"
 	"workshop/internal/domain/species"
 )
 
-templ SightingCard(s sighting.Sighting) {
-	<article class="card">
-		<!-- Header -->
-		<header class="card__header">
-			<h2>{ displayName(s.Species) }</h2>
+templ SightingCard(s sighting.Sighting, pos int) {
+	<article class={ "entry", templ.KV("entry--off", pos == 0) } id={ Anchor(s) }>
+		if pos == 0 {
+			<p class="entry__pos entry__pos--off">OFF</p>
+		} else {
+			<p class="entry__pos">
+				<span class="visually-hidden">Position </span><span aria-hidden="true">P</span>{ position(pos) }
+			</p>
+		}
+		if photo, ok := firstPhoto(s.Media); ok {
+			<a class="entry__photo" href={ templ.URL(photo.URL) } data-lightbox data-caption={ credit(photo) }>
+				<img src={ photo.URL } alt={ cmp.Or(photo.Title, displayName(s.Species)) } loading="lazy"/>
+			</a>
+		} else {
+			<div class="entry__photo entry__photo--none">
+				<span>No photo</span>
+			</div>
+		}
+		<header class="entry__head">
+			<h3><a href={ templ.URL(ReportURL(s)) }>{ displayName(s.Species) }</a></h3>
 			if s.Species.ScientificName != "" {
-				<p class="card__scientific">{ s.Species.ScientificName }</p>
+				<p class="entry__scientific">{ s.Species.ScientificName }</p>
 			}
+			@StageBadge(s)
 		</header>
-		<!-- Meta -->
-		<dl class="card__meta">
-			<dt>Seen</dt>
-			<dd>{ s.HappenedAt.Format("2 January 2006") }</dd>
-			<dt>Where</dt>
-			<dd>{ place(s.Location) }</dd>
+		<dl class="entry__meta">
+			<div>
+				<dt>Seen</dt>
+				<dd>
+					<time datetime={ s.HappenedAt.Format("2006-01-02") }>{ s.HappenedAt.Format("2 Jan 2006") }</time>
+				</dd>
+			</div>
+			<div>
+				<dt>Where</dt>
+				<dd>{ place(s.Location) }</dd>
+			</div>
+			<div>
+				<dt>Crew</dt>
+				<dd>{ cmp.Or(s.RecordedBy, "Not recorded") }</dd>
+			</div>
 			if s.IndividualCount != nil {
-				<dt>Count</dt>
-				<dd>{ individuals(*s.IndividualCount) }</dd>
+				<div>
+					<dt>Count</dt>
+					<dd>{ individuals(*s.IndividualCount) }</dd>
+				</div>
 			}
-			if s.RecordedBy != "" {
-				<dt>Recorded by</dt>
-				<dd>{ s.RecordedBy }</dd>
-			}
+			<div class="entry__conditions">
+				<dt>Stage conditions</dt>
+				<dd>
+					@StageConditions(s.Weather, false)
+				</dd>
+			</div>
 		</dl>
-		<!-- Gallery -->
-		<div class="card__gallery">
-			@Gallery(s.Media)
+		<div class="entry__more">
+			if extra := morePhotos(s.Media, 3); len(extra) > 0 {
+				@Gallery(extra)
+			}
+			<a class="entry__report" href={ templ.URL(ReportURL(s)) }>Stage report<span class="visually-hidden">: { displayName(s.Species) }</span> →</a>
 		</div>
 	</article>
 }
 
 // displayName prefers the name a reader would recognise, falling back
-// through the taxonomy as GBIF records thin out.
+// through the taxonomy as GBIF records thin out, with a capital first letter.
 func displayName(sp species.Species) string {
-	return cmp.Or(sp.VernacularName, sp.CanonicalName, sp.ScientificName, "Unknown species")
+	name := cmp.Or(sp.VernacularName, sp.CanonicalName, sp.ScientificName, "Unknown species")
+	r, size := utf8.DecodeRuneInString(name)
+	return string(unicode.ToUpper(r)) + name[size:]
 }
 
 // place joins whichever parts of the location GBIF supplied.
@@ -62,4 +97,46 @@ func individuals(n int) string {
 		return "1 individual"
 	}
 	return fmt.Sprintf("%d individuals", n)
+}
+
+// ReportURL is the address of a sighting's stage report.
+func ReportURL(s sighting.Sighting) string {
+	return "/sightings/" + s.ID.String()
+}
+
+// position renders an entry number the way a timing board does, two digits wide.
+func position(n int) string {
+	return fmt.Sprintf("%02d", n)
+}
+
+// photos keeps the still images, the only media an img can show.
+func photos(media []sighting.Media) []sighting.Media {
+	return slices.DeleteFunc(slices.Clone(media), func(m sighting.Media) bool {
+		return m.Type != "StillImage" || m.URL == ""
+	})
+}
+
+// firstPhoto is the photo an entry leads with.
+func firstPhoto(media []sighting.Media) (sighting.Media, bool) {
+	if p := photos(media); len(p) > 0 {
+		return p[0], true
+	}
+	return sighting.Media{}, false
+}
+
+// morePhotos is up to n photos after the first.
+func morePhotos(media []sighting.Media, n int) []sighting.Media {
+	p := photos(media)
+	if len(p) < 2 {
+		return nil
+	}
+	return p[1:min(len(p), n+1)]
+}
+
+// credit names who took a photo, for its caption.
+func credit(m sighting.Media) string {
+	if m.Creator == "" {
+		return ""
+	}
+	return "Photo: " + m.Creator
 }

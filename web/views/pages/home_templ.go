@@ -9,6 +9,7 @@ import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
 import (
+	"strconv"
 	"workshop/internal/domain/sighting"
 	"workshop/web/views/components"
 	"workshop/web/views/layout"
@@ -35,6 +36,10 @@ func Home(sightings []sighting.Sighting) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
+		sum := sighting.Summarise(sightings)
+		byYear := sighting.CountByYear(sightings)
+		onRoute := components.CountOnRoute(sightings)
+		ordered := components.ByDistance(sightings)
 		templ_7745c5c3_Var2 := templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 			templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 			templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
@@ -47,56 +52,183 @@ func Home(sightings []sighting.Sighting) templ.Component {
 				}()
 			}
 			ctx = templ.InitializeContext(ctx)
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<h1>Sightings</h1>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<section class=\"hero\"><div class=\"hero__text\"><p class=\"kicker\"><span class=\"flag\" aria-hidden=\"true\"></span>FIA World Rally Championship · Kenya</p><h1 class=\"hero__title\"><span>Safari Rally</span> <span class=\"hero__title-accent\">Kenya</span></h1><p class=\"hero__stages\">Naivasha · Hell's Gate · Soysambu</p><p class=\"hero__lede\">The wildlife living along the rally's stages in the Great Rift Valley. Every sighting is timed against the real 2026 route: how far it was from the nearest stage, and whether it was on the road book at all.</p><dl class=\"board\"><div class=\"board__cell\"><dt>12–15 Mar 2026</dt><dd>4<small>days</small></dd></div><div class=\"board__cell\"><dt>Special stages</dt><dd>20</dd></div><div class=\"board__cell\"><dt>Competitive</dt><dd>350.52<small>km</small></dd></div><div class=\"board__cell board__cell--live\"><dt>On the route</dt><dd>")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var3 string
+			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(onRoute)
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/views/pages/home.templ`, Line: 50, Col: 19}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<small>/")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var4 string
+			templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(strconv.Itoa(sum.Sightings))
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/views/pages/home.templ`, Line: 50, Col: 58}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "</small></dd></div></dl><p class=\"hero__cta\"><a class=\"button\" href=\"#entries\">See the stage results</a> <a class=\"button button--ghost\" href=\"#route\">Stage route map</a></p></div><figure class=\"hero__photo\"><img src=\"/assets/images/rally/safari-2024.jpg\" srcset=\"/assets/images/rally/safari-2024-960.jpg 960w, /assets/images/rally/safari-2024.jpg 1280w\" sizes=\"(max-width: 860px) 100vw, 46vw\" alt=\"Kajetan Kajetanowicz's rally car throws up red dust on a bush stage of the 2024 Safari Rally Kenya\" width=\"1280\" height=\"853\" fetchpriority=\"high\"><div class=\"hero__wheel\">")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = components.ThreeScene(components.ThreeSceneProps{Scene: "rally-wheel"}).Render(ctx, templ_7745c5c3_Buffer)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "</div><figcaption>Safari Rally 2024 by <a href=\"https://commons.wikimedia.org/wiki/File:Kajetan_Kajetanowicz_Rajd_Safari2024.jpg\">Radziejka</a>, <a href=\"https://creativecommons.org/licenses/by-sa/4.0/\">CC BY-SA 4.0</a></figcaption></figure></section><section id=\"route\" class=\"section reveal\"><header class=\"section__head\"><p class=\"section__num\">SS1</p><h2>Stage route</h2><p class=\"section__note\">The 2026 stages in running order, from the Naivasha service park to the Hell's Gate Power Stage. Red dots are sightings within ")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var5 string
+			templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(strconv.Itoa(int(components.RouteKm)))
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/views/pages/home.templ`, Line: 83, Col: 74}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, " km of a stage, grey ones are off route. Click a dot to jump to its entry.</p></header>")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = components.Map(components.MapProps{
+				Points:  components.MapPoints(sightings),
+				Stages:  components.Stages,
+				MaxZoom: 10,
+				Label:   "Map of the 2026 Safari Rally Kenya stages and the wildlife sightings near them",
+				Class:   "map--dark",
+			}).Render(ctx, templ_7745c5c3_Buffer)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "<ul class=\"legend\" aria-hidden=\"true\"><li><span class=\"legend__flag\"></span>Stage</li><li><span class=\"legend__flag legend__flag--power\"></span>Power Stage</li><li><span class=\"legend__dot\"></span>On the route</li><li><span class=\"legend__dot legend__dot--off\"></span>Off route</li></ul></section><section id=\"entries\" class=\"section\"><header class=\"section__head reveal\"><p class=\"section__num\">SS2</p><h2>Stage results</h2><p class=\"section__note\">")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var6 string
+			templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(onRoute)
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/views/pages/home.templ`, Line: 105, Col: 14}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, " on the route and ")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var7 string
+			templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(sum.Sightings - onRoute)
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/views/pages/home.templ`, Line: 105, Col: 59}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, " elsewhere in Kenya, ranked by distance to the nearest stage.</p></header>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			if len(sightings) == 0 {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<p>No sightings have been ingested yet.</p>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "<p class=\"empty\">No wildlife on the route yet. Run <code>go run . db seed</code> and refresh.</p>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			} else {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "<p>Total: ")
+				templ_7745c5c3_Err = components.Filter(components.FilterProps{
+					Target: "entry-list",
+					Search: true,
+					Groups: []components.FilterGroup{
+						{Key: "stage", Label: "Nearest stage", Options: components.StageOptions(sightings)},
+						{Key: "animal", Label: "Animal", Options: components.FilterOptions(sightings, 12, components.Animal)},
+						{Key: "year", Label: "Year", Options: components.YearOptions(sightings)},
+					},
+				}).Render(ctx, templ_7745c5c3_Buffer)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				var templ_7745c5c3_Var3 string
-				templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(len(sightings))
-				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/views/pages/home.templ`, Line: 17, Col: 29}
-				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, " <ol id=\"entry-list\" class=\"entries\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "</p><ul class=\"sightings\">")
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
+				for i, s := range ordered {
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "<li")
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+					templ_7745c5c3_Err = templ.RenderAttributes(ctx, templ_7745c5c3_Buffer, components.FilterAttrs(s))
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, ">")
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+					templ_7745c5c3_Err = components.SightingCard(s, entryPosition(s, i)).Render(ctx, templ_7745c5c3_Buffer)
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "</li>")
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
 				}
-				for _, s := range sightings {
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "<li>")
-					if templ_7745c5c3_Err != nil {
-						return templ_7745c5c3_Err
-					}
-					templ_7745c5c3_Err = components.SightingCard(s).Render(ctx, templ_7745c5c3_Buffer)
-					if templ_7745c5c3_Err != nil {
-						return templ_7745c5c3_Err
-					}
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "</li>")
-					if templ_7745c5c3_Err != nil {
-						return templ_7745c5c3_Err
-					}
-				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "</ul>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "</ol>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "</section><section id=\"standings\" class=\"section reveal\"><header class=\"section__head\"><p class=\"section__num\">SS3</p><h2>Championship standings</h2><p class=\"section__note\">Who turns up most, and which stages and years had the most sightings.</p></header><div class=\"standings\"><div class=\"panel\"><h3 class=\"panel__title\">Most seen</h3>")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = components.Bars(components.TopAnimals(sightings, 8)).Render(ctx, templ_7745c5c3_Buffer)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "</div><div class=\"panel\"><h3 class=\"panel__title\">Busiest stages</h3>")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = components.Bars(components.StageTally(sightings, 8)).Render(ctx, templ_7745c5c3_Buffer)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "</div><div class=\"panel\"><h3 class=\"panel__title\">Results by year</h3>")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = components.YearResults(byYear).Render(ctx, templ_7745c5c3_Buffer)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "</div></div><p class=\"section__more\"><a class=\"button button--ghost\" href=\"/stats\">Full standings</a></p></section><section id=\"rally\" class=\"section reveal\"><header class=\"section__head\"><p class=\"section__num\">SS4</p><h2>From the rally</h2><p class=\"section__note\">The Safari first ran in 1953 and is back in the WRC, now based at Naivasha. Click a photo to see it big.</p></header><ul class=\"rally-photos\"><li><a href=\"/assets/images/rally/naivasha-dust.jpg\" data-lightbox data-caption=\"Kenya National Rally Championship at Naivasha, 2016, by Jared-G-Maina, CC BY-SA 4.0\"><img src=\"/assets/images/rally/naivasha-dust.jpg\" alt=\"A rally car disappears into a wall of dust below the hills at Naivasha\" width=\"1280\" height=\"720\" loading=\"lazy\"></a><p class=\"credit\">Kenya National Rally at Naivasha, 2016. <a href=\"https://commons.wikimedia.org/wiki/File:Kenya_KCB_Rally_Naivasha_4.jpg\">Jared-G-Maina</a>, <a href=\"https://creativecommons.org/licenses/by-sa/4.0/\">CC BY-SA 4.0</a></p></li><li><a href=\"/assets/images/rally/dust.jpg\" data-lightbox data-caption=\"Safari Rally 2021 by Joelm69, CC BY-SA 4.0\"><img src=\"/assets/images/rally/dust.jpg\" alt=\"A rally car sliding through a cloud of red dust on a Kenyan stage\" width=\"720\" height=\"405\" loading=\"lazy\"></a><p class=\"credit\">Safari Rally 2021. <a href=\"https://commons.wikimedia.org/wiki/File:WRC_Safari_Rally_2021_(cropped_2).jpg\">Joelm69</a>, <a href=\"https://creativecommons.org/licenses/by-sa/4.0/\">CC BY-SA 4.0</a></p></li><li><a href=\"/assets/images/rally/helicopter.jpg\" data-lightbox data-caption=\"Safari Rally 2021 by Joelm69, CC BY-SA 4.0\"><img src=\"/assets/images/rally/helicopter.jpg\" alt=\"A helicopter tracks a rally car through red dust\" width=\"720\" height=\"480\" loading=\"lazy\"></a><p class=\"credit\">The TV helicopter, 2021. <a href=\"https://commons.wikimedia.org/wiki/File:WRC_Safari_Rally_2021_(cropped_3).jpg\">Joelm69</a>, <a href=\"https://creativecommons.org/licenses/by-sa/4.0/\">CC BY-SA 4.0</a></p></li><li><a href=\"/assets/images/rally/katsuta-yaris.jpg\" data-lightbox data-caption=\"Takamoto Katsuta's 2021 Safari Rally Kenya Toyota Yaris WRC, by TTTNIS, CC0\"><img src=\"/assets/images/rally/katsuta-yaris.jpg\" alt=\"Takamoto Katsuta's red and white Toyota Yaris WRC in its Kenya livery\" width=\"1280\" height=\"729\" loading=\"lazy\"></a><p class=\"credit\">Katsuta's 2021 Safari Yaris. He won in 2026. <a href=\"https://commons.wikimedia.org/wiki/File:2021_Toyota_Yaris_WRC_Katsuta.jpg\">TTTNIS</a>, CC0</p></li></ul></section>")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
 			return nil
 		})
 		templ_7745c5c3_Err = layout.Base(layout.BaseProps{
-			Title: "Sightings",
+			Title:       "Safari Rally Kenya · Wildlife on the route",
+			Description: "Wildlife spotted along the WRC Safari Rally Kenya route: Naivasha, Hell's Gate and Soysambu.",
+			Current:     "home",
+			Map:         true,
+			Scene:       true,
+			Filter:      true,
 		}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var2), templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err

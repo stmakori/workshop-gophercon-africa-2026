@@ -1,0 +1,45 @@
+package components
+
+import (
+	"strconv"
+	"workshop/internal/domain/sighting"
+)
+
+templ Bars(rows []sighting.Tally) {
+	if len(rows) > 0 {
+		<ol class="bars">
+			for i, row := range rows {
+				<li class="bars__row" style={ bar(row.Count, rows[0].Count) }>
+					<span class="bars__pos">{ position(i + 1) }</span>
+					<span class="bars__name">{ row.Name }</span>
+					<span class="bars__count">{ row.Count }</span>
+				</li>
+			}
+		</ol>
+	}
+}
+
+templ YearResults(byYear map[int]int) {
+	if len(byYear) > 0 {
+		{{ _, high := peak(byYear) }}
+		<table class="results">
+			<caption class="visually-hidden">Sightings per year</caption>
+			<thead>
+				<tr>
+					<th scope="col">Year</th>
+					<th scope="col"><span class="visually-hidden">Share</span></th>
+					<th scope="col">Sightings</th>
+				</tr>
+			</thead>
+			<tbody>
+				for _, y := range yearsNewestFirst(byYear) {
+					<tr class={ "results__row", templ.KV("results__row--best", byYear[y] == high) } style={ bar(byYear[y], high) }>
+						<th scope="row">{ strconv.Itoa(y) }</th>
+						<td class="results__bar"><span></span></td>
+						<td class="results__count">{ byYear[y] }</td>
+					</tr>
+				}
+			</tbody>
+		</table>
+	}
+}
